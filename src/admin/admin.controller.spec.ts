@@ -15,4 +15,8 @@ describe('Admin Controller', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  it('should be defined', () => {
+    expect(controller.hello).toBeDefined();
+  });
 });
