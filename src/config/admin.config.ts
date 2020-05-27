@@ -1,10 +1,10 @@
 import Admin from "../entity/Admin";
 import Authority from "../entity/Authority";
 import AuthorityEnum from "../common/enum/AuthorityEnum";
-import AdminRepository from "../admin/admin.repository"
+import { AdminRepository } from "../admin/admin.repository"
 import bcrypt from "bcrypt"
 import serverConfig from "./server.config";
-import AuthorityRepository from "../authority/authority.repository"
+import { AuthorityRepository } from "../authority/authority.repository"
 import { Logger } from '@nestjs/common';
 
 interface initAdminInfo {
@@ -37,9 +37,10 @@ const initAuthority = async () => {
         let keys = Object.keys(AuthorityEnum);
         console.log(`keys: ${JSON.stringify(keys)}`)
         console.log(`values: ${JSON.stringify(Object.values(AuthorityEnum))}`)
+        let authorityRepository = new AuthorityRepository();
         for (let index = 0; index < keys.length; index++) {
             let role = keys[index];
-            let authority = await AuthorityRepository.findOneByRole(role);
+            let authority = await authorityRepository.findOneByRole(role);
             if (!authority) {
                 let newAuthority = new Authority();
                 newAuthority.role = role;
@@ -58,17 +59,19 @@ const initAuthority = async () => {
 const initAdmin = async (adminConfig: adminConfig) => {
     let logger = new Logger("initAdmin");
     await initAuthority();
+    let adminRepository = new AdminRepository();
+    let authorityRepository = new AuthorityRepository();
     for (let idx = 0; idx < adminConfig.initialAdmins.length; idx++) {
-        let admin = await AdminRepository.findOneByAccount(adminConfig.initialAdmins[idx].adminAccount);
+        let admin = await adminRepository.findOneByAccount(adminConfig.initialAdmins[idx].adminAccount);
         if (!admin) {
             let newAdmin = new Admin();
             newAdmin.account = adminConfig.initialAdmins[idx].adminAccount;
             newAdmin.password = await bcrypt.hash(adminConfig.initialAdmins[idx].adminPassword, serverConfig.saltRounds);
             if(adminConfig.initialAdmins[idx].isRoot){
-                let authority = await AuthorityRepository.findOneByRole(AuthorityEnum[AuthorityEnum.ROOT]);
+                let authority = await authorityRepository.findOneByRole(AuthorityEnum[AuthorityEnum.ROOT]);
                 newAdmin.authority = authority;
             } else {
-                let authority = await AuthorityRepository.findOneByRole(AuthorityEnum[AuthorityEnum.ADMIN]);
+                let authority = await authorityRepository.findOneByRole(AuthorityEnum[AuthorityEnum.ADMIN]);
                 newAdmin.authority = authority;
             }
             await newAdmin.save();

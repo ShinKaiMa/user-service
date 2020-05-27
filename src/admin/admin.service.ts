@@ -4,11 +4,12 @@ import AuthFailureReasonEnum from "../common/enum/AuthFailureReasonEnum";
 import bcrypt from "bcrypt"
 import { classToPlain } from "class-transformer";
 import jwt from "jsonwebtoken";
-import AdminRepository from "../admin/admin.repository";
+import { AdminRepository } from "../admin/admin.repository";
 import key from "../config/key";
 
 @Injectable()
 export class AdminService {
+    constructor(private adminRepository: AdminRepository) {}
     private readonly logger = new Logger(AdminService.name);
 
     signIn(account: string, password: string): Promise<string> {
@@ -18,7 +19,7 @@ export class AdminService {
                     reject(new AuthError(AuthFailureReasonEnum.BAD_REQUEST));
                 }
 
-                let admin = await AdminRepository.findOneByAccount(account);
+                let admin = await this.adminRepository.findOneByAccount(account);
 
                 if (admin) {
                     let isCorrect = await bcrypt.compare(password, admin.password);

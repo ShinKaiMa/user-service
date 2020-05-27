@@ -1,11 +1,12 @@
 import Admin from "../entity/Admin"
 import {getRepository} from "typeorm";
-import { Logger } from "@nestjs/common";
+import { Logger, Injectable } from "@nestjs/common";
 
-export default class AdminRepository {
+@Injectable()
+export class AdminRepository {
     private readonly logger = new Logger(AdminRepository.name);
 
-    public static async findOneByPhoneNumer(phoneNumber:string): Promise<Admin> {
+    async findOneByPhoneNumer(phoneNumber:string): Promise<Admin> {
         return new Promise(async (resolve, reject) => {
             try {
                 let adminRepository = await getRepository(Admin);
@@ -17,7 +18,7 @@ export default class AdminRepository {
         })
     }
 
-    public static async findOneByAccount(account:string): Promise<Admin> {
+    async findOneByAccount(account:string): Promise<Admin> {
         return new Promise(async (resolve, reject) => {
             try {
                 let adminRepository = await getRepository(Admin);

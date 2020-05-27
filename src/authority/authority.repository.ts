@@ -3,8 +3,8 @@ import { getRepository } from "typeorm";
 import { Logger } from "@nestjs/common";
 
 
-export default class AuthorityRepository {
-    public static async findOneByRole(role: string): Promise<Authority> {
+export class AuthorityRepository {
+    async findOneByRole(role: string): Promise<Authority> {
         return new Promise(async (resolve, reject) => {
             try {
                 let authorityRepository = await getRepository(Authority);
