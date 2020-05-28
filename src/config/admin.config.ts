@@ -1,11 +1,11 @@
 import Admin from "../entity/Admin";
 import Authority from "../entity/Authority";
 import AuthorityEnum from "../common/enum/AuthorityEnum";
-import { AdminRepository } from "../admin/admin.repository"
 import bcrypt from "bcrypt"
 import serverConfig from "./server.config";
 import { AuthorityRepository } from "../authority/authority.repository"
 import { Logger } from '@nestjs/common';
+import {getRepository} from "typeorm";
 
 interface initAdminInfo {
     adminAccount: string,
@@ -37,10 +37,11 @@ const initAuthority = async () => {
         let keys = Object.keys(AuthorityEnum);
         console.log(`keys: ${JSON.stringify(keys)}`)
         console.log(`values: ${JSON.stringify(Object.values(AuthorityEnum))}`)
-        let authorityRepository = new AuthorityRepository();
+        let authorityRepository = await getRepository(Authority);
         for (let index = 0; index < keys.length; index++) {
             let role = keys[index];
-            let authority = await authorityRepository.findOneByRole(role);
+            let authorities = await authorityRepository.find({where: {role}, take:1});
+            let authority = authorities[0];
             if (!authority) {
                 let newAuthority = new Authority();
                 newAuthority.role = role;
@@ -59,10 +60,11 @@ const initAuthority = async () => {
 const initAdmin = async (adminConfig: adminConfig) => {
     let logger = new Logger("initAdmin");
     await initAuthority();
-    let adminRepository = new AdminRepository();
+    let adminRepository = await getRepository(Admin);
     let authorityRepository = new AuthorityRepository();
     for (let idx = 0; idx < adminConfig.initialAdmins.length; idx++) {
-        let admin = await adminRepository.findOneByAccount(adminConfig.initialAdmins[idx].adminAccount);
+        let admins = await adminRepository.find({where: {account: adminConfig.initialAdmins[idx].adminAccount}, take:1});
+        let admin = admins[0];
         if (!admin) {
             let newAdmin = new Admin();
             newAdmin.account = adminConfig.initialAdmins[idx].adminAccount;
