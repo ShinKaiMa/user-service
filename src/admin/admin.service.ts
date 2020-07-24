@@ -54,4 +54,14 @@ export class AdminService {
             }
         })
     }
+
+    async findAll(): Promise<Admin[]> {
+        try {
+            let admins = await this.adminRepository.find();
+            return admins;
+        } catch (error) {
+            console.error(error)
+            return null;
+        }
+    }
 }

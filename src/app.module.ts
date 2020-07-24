@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AdminController } from './admin/admin.controller';
 import { AdminService } from './admin/admin.service';
 import Member from "./entity/Member";
 import Admin from "./entity/Admin";
 import Authority from "./entity/Authority";
 import { AdminAuthGuard }  from "./admin-auth.guard";
-import { AdminRepository } from "./admin/admin.repository";
 import { AdminModule } from './admin/admin.module';
+import { AdminController } from './admin/admin.controller'
 
 @Module({
   imports: [
@@ -31,6 +30,5 @@ import { AdminModule } from './admin/admin.module';
     }),
     AdminModule,
   ],
-  providers: [AdminAuthGuard, AdminService, AdminRepository],
 })
 export class AppModule {}
